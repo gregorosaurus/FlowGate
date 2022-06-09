@@ -6,6 +6,10 @@ FlowGate is a state-of-the-art Synapse execution tool that allows you to trigger
 
 FlowGate is a Blazor application that uses application settings to determine which Synapse pipeline to trigger. 
 
+# Example
+
+Check out an example by clicking [here](https://flowgate.azurewebsites.net).
+
 ## Configuration
 
 | Setting Name | Description |
