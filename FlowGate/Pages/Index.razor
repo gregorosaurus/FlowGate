@@ -1,0 +1,47 @@
+﻿@page "/"
+@using System.Linq;
+@inject IJSRuntime jsRuntime;
+@inject Services.SynapseTriggerService synapseTriggerService;
+@inject FlowGatePipelineRunOptions pipelineRunOptions;
+
+<PageTitle>The Button - @pipelineRunOptions.PipelineName</PageTitle>
+<div class="button-area" style="margin-top:0px;">
+    <a @onclick="async e=>await TriggerPipeline()" class="button @(IsTriggering ? "triggering" :"")"></a>
+</div>
+
+<canvas class="confetti" id="confetti" style="width:100%;height:100%; z-index:9999;"></canvas>
+
+@code{
+    private bool IsTriggering = false;
+
+    private IJSObjectReference? confetti;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender){
+           confetti = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/confetti.js");
+        }
+    }
+
+    public async Task TriggerPipeline()
+    {
+        IsTriggering = true;
+        await Task.Delay(TimeSpan.FromSeconds(1));
+        var pipeline = await synapseTriggerService.GetPipelineAsync(pipelineRunOptions.PipelineName);
+        if(pipeline != null)
+        {
+            await synapseTriggerService.RunPipeline(pipeline);
+
+            
+            await confetti!.InvokeVoidAsync("startConfetti"); //confetti
+
+            await Task.Delay(TimeSpan.FromSeconds(3));
+        }else
+        {
+            //#TODO: alert failure
+        }
+
+        IsTriggering = false;
+    }
+}
+
