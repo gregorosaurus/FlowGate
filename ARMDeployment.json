@@ -49,7 +49,7 @@
     "variables": {
         "webAppName": "[parameters('appName')]",
         "hostingPlanName": "[concat(parameters('appName'),'_asp')]",
-        "zipUrl": "https://github.com/gregorosaurus/Spectacles/releases/latest/download/build_release.zip",
+        "zipUrl": "https://github.com/gregorosaurus/FlowGate/releases/latest/download/build_release.zip",
         "storageAccountApiVersion": "2021-04-01"
     },
     "resources": [
