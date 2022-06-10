@@ -1,0 +1,134 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the flowgate web app resource."
+            }
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "string",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "ClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "The ID of the service principal created that has the correct Synapse RBAC permissions granted (see github page for more information."
+            }
+        },
+        "ClientSecret": {
+            "type": "string",
+            "metadata": {
+                "description": "The service principal secret."
+            }
+        },
+        "TenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "The GUID of the tenant that the service principal was created in."
+            }
+        },
+        "WorkspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The synapse workspace name where the pipeline is located."
+            }
+        },
+        "PipelineName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the pipeline you wish to trigger.  Case sensitive."
+            }
+        }
+    },
+    "variables": {
+        "webAppName": "[parameters('appName')]",
+        "hostingPlanName": "[concat(parameters('appName'),'_asp')]",
+        "zipUrl": "https://github.com/gregorosaurus/Spectacles/releases/latest/download/build_release.zip",
+        "storageAccountApiVersion": "2021-04-01"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2021-01-15",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "F1",
+                "tier": "Free",
+                "size": "F1",
+                "family": "F",
+                "capacity": 0
+            },
+            "kind": "app"
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2021-01-15",
+            "name": "[variables('webAppName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+            ],
+            "resources": [
+                {
+                    "name": "MSDeploy",
+                    "type": "extensions",
+                    "apiVersion": "2021-01-15",
+                    "dependsOn": [
+                      "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
+                    ],
+                    "properties": {
+                        "packageUri": "[variables('zipUrl')]"
+                    },
+                    "condition": "[not(equals(variables('zipUrl'), ''))]"
+                }
+            ],
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "ClientId",
+                            "value": "[parameters('ClientId')]"
+                        },
+                        {
+                            "name": "ClientSecret",
+                            "value": "[parameters('ClientId')]"
+                        },
+                        {
+                            "name": "TenantId",
+                            "value": "[parameters('TenantId')]"
+                        },
+                        {
+                            "name": "WorkspaceName",
+                            "value": "[parameters('WorkspaceName')]"
+                        },
+                        {
+                            "name": "PipelineName",
+                            "value": "[parameters('PipelineName')]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(variables('webAppName'), '/web')]",
+            "properties": {
+                "netFrameworkVersion": "v6.0"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+            ]
+        }
+    ]
+}

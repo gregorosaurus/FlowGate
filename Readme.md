@@ -10,6 +10,12 @@ FlowGate is a Blazor application that uses application settings to determine whi
 
 Check out an example by clicking [here](https://flowgate.azurewebsites.net).
 
+## Deployment
+Simply click the deploy to Azure button and instantly get this state of the art tool in your own environment! 
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](
+https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fgregorosaurus%2FFlowGate%2Fmain%2FARMDeployment.json)
+
 ## Configuration
 
 | Setting Name | Description |
