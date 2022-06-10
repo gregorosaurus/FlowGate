@@ -101,7 +101,7 @@
                         },
                         {
                             "name": "ClientSecret",
-                            "value": "[parameters('ClientId')]"
+                            "value": "[parameters('ClientSecret')]"
                         },
                         {
                             "name": "TenantId",
